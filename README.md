@@ -1,6 +1,6 @@
 # Pokemon Tracker Skills for Claude Code
 
-Custom [Claude Code](https://claude.ai/code) skills for the [Pokemon Price Tracker](https://github.com/YOUR_USERNAME/pokemon-tracker) project — a multi-source price tracking pipeline for Pokemon TCG cards across CardMarket and eBay.
+Custom [Claude Code](https://claude.ai/code) skills for the [Pokemon Price Tracker](https://github.com/YOUR_USERNAME/pokemon-tracker) project — a multi-source price tracking pipeline for Pokemon TCG cards.
 
 ## Skills
 
