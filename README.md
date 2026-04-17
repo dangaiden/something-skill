@@ -38,23 +38,11 @@ It checks:
 
 ## Installation
 
-### With `npx` (one-liner)
-
 ```bash
-npx @anthropic-ai/claude-code skills add /review-pending https://github.com/YOUR_USERNAME/something-skill
-npx @anthropic-ai/claude-code skills add /scrape-status https://github.com/YOUR_USERNAME/something-skill
+npx skills add dangaiden/something-skill
 ```
 
-### Manual
-
-Copy the skill directories into your project's `.claude/skills/`:
-
-```bash
-# From your project root
-mkdir -p .claude/skills
-cp -r review-pending .claude/skills/
-cp -r scrape-status .claude/skills/
-```
+This installs both skills into your project's `.claude/skills/` directory.
 
 ## Context
 
