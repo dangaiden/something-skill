@@ -1,0 +1,9 @@
+{
+  "name": "something-skill",
+  "description": "Agent skills for project overview and exploration",
+  "version": "1.0.0",
+  "author": {
+    "name": "dangaiden"
+  },
+  "repository": "https://github.com/dangaiden/something-skill"
+}
