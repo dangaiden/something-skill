@@ -1,0 +1,16 @@
+{
+  "name": "something-skill",
+  "owner": {
+    "name": "dangaiden"
+  },
+  "metadata": {
+    "description": "Agent skills for project overview and exploration"
+  },
+  "plugins": [
+    {
+      "name": "something-skill",
+      "source": "./",
+      "description": "Agent skills for project overview and exploration"
+    }
+  ]
+}
