@@ -1,15 +1,4 @@
 {
   "version": 1,
-  "skills": {
-    "review-pending": {
-      "source": "dangaiden/something-skill",
-      "sourceType": "github",
-      "computedHash": "e2088a344bb86b83ec174e80f953394467c188ca9c5c54897f259d4215470af2"
-    },
-    "scrape-status": {
-      "source": "dangaiden/something-skill",
-      "sourceType": "github",
-      "computedHash": "a94ebb4fd174b142e0714e0a522595e1b073f7626074bbcf931cf5f7f883ec53"
-    }
-  }
+  "skills": {}
 }
