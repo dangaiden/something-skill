@@ -16,9 +16,23 @@ Generates a concise overview of any project — structure, purpose, recent git a
 
 ## Installation
 
+### Claude Code
+
+```
+/plugin marketplace add dangaiden/something-skill
+/plugin install something-skill@something-skill
+/reload-plugins
+```
+
+The skill will appear as `/something-skill:dangaiden-project-overview`.
+
+### Other agents (Cursor, Copilot, etc.)
+
 ```bash
 npx skills add dangaiden/something-skill
 ```
+
+> **Note:** `npx skills add` installs into `.agents/skills/`, which Claude Code does not read. Use the plugin marketplace flow above for Claude Code.
 
 ## License
 
