@@ -1,0 +1,939 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Deploy up to 20 EC2 instances (Amazon Linux 2023) each in a public subnet
+  with auto-assigned public IPs. Node.js included. Instance count is parameterized.
+
+Parameters:
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an existing EC2 key pair for SSH access.
+
+  InstanceCount:
+    Type: Number
+    Default: 10
+    MinValue: 1
+    MaxValue: 20
+    Description: Number of EC2 instances to create (1-20).
+
+  AllowedSSHCidr:
+    Type: String
+    Default: "0.0.0.0/0"
+    AllowedPattern: "^(\\d{1,3}\\.){3}\\d{1,3}/\\d{1,2}$"
+    Description: CIDR block allowed to SSH into the instances.
+
+  SkillName:
+    Type: String
+    Default: ""
+    Description: >
+      Optional. If set, runs `npx --yes skills add <SkillName> --all` on boot.
+
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - t3.medium
+    Description: EC2 instance type.
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Default: "vpc-086173b9355df27bf"
+    Description: VPC to deploy into (default VPC).
+
+  SubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Default: "subnet-0684c9dd0cf038e9a"
+    Description: Public subnet with MapPublicIpOnLaunch enabled.
+
+Conditions:
+  CreateInstance01: !Or
+      - !Equals [!Ref InstanceCount, 1]
+      - !Equals [!Ref InstanceCount, 2]
+      - !Equals [!Ref InstanceCount, 3]
+      - !Equals [!Ref InstanceCount, 4]
+      - !Equals [!Ref InstanceCount, 5]
+      - !Equals [!Ref InstanceCount, 6]
+      - !Equals [!Ref InstanceCount, 7]
+      - !Equals [!Ref InstanceCount, 8]
+      - !Equals [!Ref InstanceCount, 9]
+      - !Or
+          - !Equals [!Ref InstanceCount, 10]
+          - !Equals [!Ref InstanceCount, 11]
+          - !Equals [!Ref InstanceCount, 12]
+          - !Equals [!Ref InstanceCount, 13]
+          - !Equals [!Ref InstanceCount, 14]
+          - !Equals [!Ref InstanceCount, 15]
+          - !Equals [!Ref InstanceCount, 16]
+          - !Equals [!Ref InstanceCount, 17]
+          - !Equals [!Ref InstanceCount, 18]
+          - !Or
+              - !Equals [!Ref InstanceCount, 19]
+              - !Equals [!Ref InstanceCount, 20]
+  CreateInstance02: !Or
+      - !Equals [!Ref InstanceCount, 2]
+      - !Equals [!Ref InstanceCount, 3]
+      - !Equals [!Ref InstanceCount, 4]
+      - !Equals [!Ref InstanceCount, 5]
+      - !Equals [!Ref InstanceCount, 6]
+      - !Equals [!Ref InstanceCount, 7]
+      - !Equals [!Ref InstanceCount, 8]
+      - !Equals [!Ref InstanceCount, 9]
+      - !Equals [!Ref InstanceCount, 10]
+      - !Or
+          - !Equals [!Ref InstanceCount, 11]
+          - !Equals [!Ref InstanceCount, 12]
+          - !Equals [!Ref InstanceCount, 13]
+          - !Equals [!Ref InstanceCount, 14]
+          - !Equals [!Ref InstanceCount, 15]
+          - !Equals [!Ref InstanceCount, 16]
+          - !Equals [!Ref InstanceCount, 17]
+          - !Equals [!Ref InstanceCount, 18]
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance03: !Or
+      - !Equals [!Ref InstanceCount, 3]
+      - !Equals [!Ref InstanceCount, 4]
+      - !Equals [!Ref InstanceCount, 5]
+      - !Equals [!Ref InstanceCount, 6]
+      - !Equals [!Ref InstanceCount, 7]
+      - !Equals [!Ref InstanceCount, 8]
+      - !Equals [!Ref InstanceCount, 9]
+      - !Equals [!Ref InstanceCount, 10]
+      - !Equals [!Ref InstanceCount, 11]
+      - !Or
+          - !Equals [!Ref InstanceCount, 12]
+          - !Equals [!Ref InstanceCount, 13]
+          - !Equals [!Ref InstanceCount, 14]
+          - !Equals [!Ref InstanceCount, 15]
+          - !Equals [!Ref InstanceCount, 16]
+          - !Equals [!Ref InstanceCount, 17]
+          - !Equals [!Ref InstanceCount, 18]
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance04: !Or
+      - !Equals [!Ref InstanceCount, 4]
+      - !Equals [!Ref InstanceCount, 5]
+      - !Equals [!Ref InstanceCount, 6]
+      - !Equals [!Ref InstanceCount, 7]
+      - !Equals [!Ref InstanceCount, 8]
+      - !Equals [!Ref InstanceCount, 9]
+      - !Equals [!Ref InstanceCount, 10]
+      - !Equals [!Ref InstanceCount, 11]
+      - !Equals [!Ref InstanceCount, 12]
+      - !Or
+          - !Equals [!Ref InstanceCount, 13]
+          - !Equals [!Ref InstanceCount, 14]
+          - !Equals [!Ref InstanceCount, 15]
+          - !Equals [!Ref InstanceCount, 16]
+          - !Equals [!Ref InstanceCount, 17]
+          - !Equals [!Ref InstanceCount, 18]
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance05: !Or
+      - !Equals [!Ref InstanceCount, 5]
+      - !Equals [!Ref InstanceCount, 6]
+      - !Equals [!Ref InstanceCount, 7]
+      - !Equals [!Ref InstanceCount, 8]
+      - !Equals [!Ref InstanceCount, 9]
+      - !Equals [!Ref InstanceCount, 10]
+      - !Equals [!Ref InstanceCount, 11]
+      - !Equals [!Ref InstanceCount, 12]
+      - !Equals [!Ref InstanceCount, 13]
+      - !Or
+          - !Equals [!Ref InstanceCount, 14]
+          - !Equals [!Ref InstanceCount, 15]
+          - !Equals [!Ref InstanceCount, 16]
+          - !Equals [!Ref InstanceCount, 17]
+          - !Equals [!Ref InstanceCount, 18]
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance06: !Or
+      - !Equals [!Ref InstanceCount, 6]
+      - !Equals [!Ref InstanceCount, 7]
+      - !Equals [!Ref InstanceCount, 8]
+      - !Equals [!Ref InstanceCount, 9]
+      - !Equals [!Ref InstanceCount, 10]
+      - !Equals [!Ref InstanceCount, 11]
+      - !Equals [!Ref InstanceCount, 12]
+      - !Equals [!Ref InstanceCount, 13]
+      - !Equals [!Ref InstanceCount, 14]
+      - !Or
+          - !Equals [!Ref InstanceCount, 15]
+          - !Equals [!Ref InstanceCount, 16]
+          - !Equals [!Ref InstanceCount, 17]
+          - !Equals [!Ref InstanceCount, 18]
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance07: !Or
+      - !Equals [!Ref InstanceCount, 7]
+      - !Equals [!Ref InstanceCount, 8]
+      - !Equals [!Ref InstanceCount, 9]
+      - !Equals [!Ref InstanceCount, 10]
+      - !Equals [!Ref InstanceCount, 11]
+      - !Equals [!Ref InstanceCount, 12]
+      - !Equals [!Ref InstanceCount, 13]
+      - !Equals [!Ref InstanceCount, 14]
+      - !Equals [!Ref InstanceCount, 15]
+      - !Or
+          - !Equals [!Ref InstanceCount, 16]
+          - !Equals [!Ref InstanceCount, 17]
+          - !Equals [!Ref InstanceCount, 18]
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance08: !Or
+      - !Equals [!Ref InstanceCount, 8]
+      - !Equals [!Ref InstanceCount, 9]
+      - !Equals [!Ref InstanceCount, 10]
+      - !Equals [!Ref InstanceCount, 11]
+      - !Equals [!Ref InstanceCount, 12]
+      - !Equals [!Ref InstanceCount, 13]
+      - !Equals [!Ref InstanceCount, 14]
+      - !Equals [!Ref InstanceCount, 15]
+      - !Equals [!Ref InstanceCount, 16]
+      - !Or
+          - !Equals [!Ref InstanceCount, 17]
+          - !Equals [!Ref InstanceCount, 18]
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance09: !Or
+      - !Equals [!Ref InstanceCount, 9]
+      - !Equals [!Ref InstanceCount, 10]
+      - !Equals [!Ref InstanceCount, 11]
+      - !Equals [!Ref InstanceCount, 12]
+      - !Equals [!Ref InstanceCount, 13]
+      - !Equals [!Ref InstanceCount, 14]
+      - !Equals [!Ref InstanceCount, 15]
+      - !Equals [!Ref InstanceCount, 16]
+      - !Equals [!Ref InstanceCount, 17]
+      - !Or
+          - !Equals [!Ref InstanceCount, 18]
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance10: !Or
+      - !Equals [!Ref InstanceCount, 10]
+      - !Equals [!Ref InstanceCount, 11]
+      - !Equals [!Ref InstanceCount, 12]
+      - !Equals [!Ref InstanceCount, 13]
+      - !Equals [!Ref InstanceCount, 14]
+      - !Equals [!Ref InstanceCount, 15]
+      - !Equals [!Ref InstanceCount, 16]
+      - !Equals [!Ref InstanceCount, 17]
+      - !Equals [!Ref InstanceCount, 18]
+      - !Or
+          - !Equals [!Ref InstanceCount, 19]
+          - !Equals [!Ref InstanceCount, 20]
+  CreateInstance11: !Or
+      - !Equals [!Ref InstanceCount, 11]
+      - !Equals [!Ref InstanceCount, 12]
+      - !Equals [!Ref InstanceCount, 13]
+      - !Equals [!Ref InstanceCount, 14]
+      - !Equals [!Ref InstanceCount, 15]
+      - !Equals [!Ref InstanceCount, 16]
+      - !Equals [!Ref InstanceCount, 17]
+      - !Equals [!Ref InstanceCount, 18]
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance12: !Or
+      - !Equals [!Ref InstanceCount, 12]
+      - !Equals [!Ref InstanceCount, 13]
+      - !Equals [!Ref InstanceCount, 14]
+      - !Equals [!Ref InstanceCount, 15]
+      - !Equals [!Ref InstanceCount, 16]
+      - !Equals [!Ref InstanceCount, 17]
+      - !Equals [!Ref InstanceCount, 18]
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance13: !Or
+      - !Equals [!Ref InstanceCount, 13]
+      - !Equals [!Ref InstanceCount, 14]
+      - !Equals [!Ref InstanceCount, 15]
+      - !Equals [!Ref InstanceCount, 16]
+      - !Equals [!Ref InstanceCount, 17]
+      - !Equals [!Ref InstanceCount, 18]
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance14: !Or
+      - !Equals [!Ref InstanceCount, 14]
+      - !Equals [!Ref InstanceCount, 15]
+      - !Equals [!Ref InstanceCount, 16]
+      - !Equals [!Ref InstanceCount, 17]
+      - !Equals [!Ref InstanceCount, 18]
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance15: !Or
+      - !Equals [!Ref InstanceCount, 15]
+      - !Equals [!Ref InstanceCount, 16]
+      - !Equals [!Ref InstanceCount, 17]
+      - !Equals [!Ref InstanceCount, 18]
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance16: !Or
+      - !Equals [!Ref InstanceCount, 16]
+      - !Equals [!Ref InstanceCount, 17]
+      - !Equals [!Ref InstanceCount, 18]
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance17: !Or
+      - !Equals [!Ref InstanceCount, 17]
+      - !Equals [!Ref InstanceCount, 18]
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance18: !Or
+      - !Equals [!Ref InstanceCount, 18]
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance19: !Or
+      - !Equals [!Ref InstanceCount, 19]
+      - !Equals [!Ref InstanceCount, 20]
+  CreateInstance20: !Equals [!Ref InstanceCount, 20]
+  HasSkillName: !Not [!Equals [!Ref SkillName, ""]]
+
+Resources:
+
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH inbound and all outbound
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: !Ref AllowedSSHCidr
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-ssh-sg"
+
+  Instance01:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance01
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-01"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then
+            npx --yes skills add ${SkillName} --all
+          fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance02:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance02
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-02"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance03:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance03
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-03"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance04:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance04
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-04"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance05:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance05
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-05"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance06:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance06
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-06"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance07:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance07
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-07"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance08:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance08
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-08"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance09:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance09
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-09"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance10:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance10
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-10"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance11:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance11
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-11"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance12:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance12
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-12"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance13:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance13
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-13"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance14:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance14
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-14"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance15:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance15
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-15"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance16:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance16
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-16"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance17:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance17
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-17"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance18:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance18
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-18"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance19:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance19
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-19"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+  Instance20:
+    Type: AWS::EC2::Instance
+    Condition: CreateInstance20
+    Properties:
+      ImageId: !Sub "resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
+      SubnetId: !Ref SubnetId
+      SecurityGroupIds:
+        - !Ref SSHSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-node-20"
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          set -euo pipefail
+          exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
+          dnf install -y git nodejs npm
+          node --version && npm --version && npx --version && git --version
+          if [ "${SkillName}" != "" ]; then npx --yes skills add ${SkillName} --all; fi
+          echo "Bootstrap complete on $(hostname)"
+
+Outputs:
+
+  SecurityGroupId:
+    Description: Security group ID used by all instances
+    Value: !Ref SSHSecurityGroup
+
+  # --- Instance IDs ---
+  InstanceId01:
+    Condition: CreateInstance01
+    Description: Instance ID for node-01
+    Value: !Ref Instance01
+  InstanceId02:
+    Condition: CreateInstance02
+    Description: Instance ID for node-02
+    Value: !Ref Instance02
+  InstanceId03:
+    Condition: CreateInstance03
+    Description: Instance ID for node-03
+    Value: !Ref Instance03
+  InstanceId04:
+    Condition: CreateInstance04
+    Description: Instance ID for node-04
+    Value: !Ref Instance04
+  InstanceId05:
+    Condition: CreateInstance05
+    Description: Instance ID for node-05
+    Value: !Ref Instance05
+  InstanceId06:
+    Condition: CreateInstance06
+    Description: Instance ID for node-06
+    Value: !Ref Instance06
+  InstanceId07:
+    Condition: CreateInstance07
+    Description: Instance ID for node-07
+    Value: !Ref Instance07
+  InstanceId08:
+    Condition: CreateInstance08
+    Description: Instance ID for node-08
+    Value: !Ref Instance08
+  InstanceId09:
+    Condition: CreateInstance09
+    Description: Instance ID for node-09
+    Value: !Ref Instance09
+  InstanceId10:
+    Condition: CreateInstance10
+    Description: Instance ID for node-10
+    Value: !Ref Instance10
+  InstanceId11:
+    Condition: CreateInstance11
+    Description: Instance ID for node-11
+    Value: !Ref Instance11
+  InstanceId12:
+    Condition: CreateInstance12
+    Description: Instance ID for node-12
+    Value: !Ref Instance12
+  InstanceId13:
+    Condition: CreateInstance13
+    Description: Instance ID for node-13
+    Value: !Ref Instance13
+  InstanceId14:
+    Condition: CreateInstance14
+    Description: Instance ID for node-14
+    Value: !Ref Instance14
+  InstanceId15:
+    Condition: CreateInstance15
+    Description: Instance ID for node-15
+    Value: !Ref Instance15
+  InstanceId16:
+    Condition: CreateInstance16
+    Description: Instance ID for node-16
+    Value: !Ref Instance16
+  InstanceId17:
+    Condition: CreateInstance17
+    Description: Instance ID for node-17
+    Value: !Ref Instance17
+  InstanceId18:
+    Condition: CreateInstance18
+    Description: Instance ID for node-18
+    Value: !Ref Instance18
+  InstanceId19:
+    Condition: CreateInstance19
+    Description: Instance ID for node-19
+    Value: !Ref Instance19
+  InstanceId20:
+    Condition: CreateInstance20
+    Description: Instance ID for node-20
+    Value: !Ref Instance20
+
+  # --- Public IPs ---
+  PublicIP01:
+    Condition: CreateInstance01
+    Description: Public IP for node-01
+    Value: !GetAtt Instance01.PublicIp
+  PublicIP02:
+    Condition: CreateInstance02
+    Description: Public IP for node-02
+    Value: !GetAtt Instance02.PublicIp
+  PublicIP03:
+    Condition: CreateInstance03
+    Description: Public IP for node-03
+    Value: !GetAtt Instance03.PublicIp
+  PublicIP04:
+    Condition: CreateInstance04
+    Description: Public IP for node-04
+    Value: !GetAtt Instance04.PublicIp
+  PublicIP05:
+    Condition: CreateInstance05
+    Description: Public IP for node-05
+    Value: !GetAtt Instance05.PublicIp
+  PublicIP06:
+    Condition: CreateInstance06
+    Description: Public IP for node-06
+    Value: !GetAtt Instance06.PublicIp
+  PublicIP07:
+    Condition: CreateInstance07
+    Description: Public IP for node-07
+    Value: !GetAtt Instance07.PublicIp
+  PublicIP08:
+    Condition: CreateInstance08
+    Description: Public IP for node-08
+    Value: !GetAtt Instance08.PublicIp
+  PublicIP09:
+    Condition: CreateInstance09
+    Description: Public IP for node-09
+    Value: !GetAtt Instance09.PublicIp
+  PublicIP10:
+    Condition: CreateInstance10
+    Description: Public IP for node-10
+    Value: !GetAtt Instance10.PublicIp
+  PublicIP11:
+    Condition: CreateInstance11
+    Description: Public IP for node-11
+    Value: !GetAtt Instance11.PublicIp
+  PublicIP12:
+    Condition: CreateInstance12
+    Description: Public IP for node-12
+    Value: !GetAtt Instance12.PublicIp
+  PublicIP13:
+    Condition: CreateInstance13
+    Description: Public IP for node-13
+    Value: !GetAtt Instance13.PublicIp
+  PublicIP14:
+    Condition: CreateInstance14
+    Description: Public IP for node-14
+    Value: !GetAtt Instance14.PublicIp
+  PublicIP15:
+    Condition: CreateInstance15
+    Description: Public IP for node-15
+    Value: !GetAtt Instance15.PublicIp
+  PublicIP16:
+    Condition: CreateInstance16
+    Description: Public IP for node-16
+    Value: !GetAtt Instance16.PublicIp
+  PublicIP17:
+    Condition: CreateInstance17
+    Description: Public IP for node-17
+    Value: !GetAtt Instance17.PublicIp
+  PublicIP18:
+    Condition: CreateInstance18
+    Description: Public IP for node-18
+    Value: !GetAtt Instance18.PublicIp
+  PublicIP19:
+    Condition: CreateInstance19
+    Description: Public IP for node-19
+    Value: !GetAtt Instance19.PublicIp
+  PublicIP20:
+    Condition: CreateInstance20
+    Description: Public IP for node-20
+    Value: !GetAtt Instance20.PublicIp

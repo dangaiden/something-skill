@@ -5,7 +5,7 @@ argument-hint: "[focus area, e.g. 'backend' or 'recent changes']"
 allowed-tools: Bash(git*) Bash(ls*) Bash(wc*) Read Grep Glob
 ---
 
-# Project Overview
+# Project Overview Skill
 
 Produce a concise, human-readable summary of this project for someone new to the codebase.
 
