@@ -1,5 +1,5 @@
 skills-lock.json
 .agents/
-.pem*
-.ssh*
-.keys*
+*.pem*
+*.ssh*
+*.keys*
